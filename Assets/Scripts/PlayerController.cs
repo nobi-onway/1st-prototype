@@ -1,12 +1,31 @@
 using UnityEngine;
+using TMPro;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    private const float SPEED = 20.0f;
     private const float TURN_SPEED = 45.0f;
+    [SerializeField]
+    private TextMeshProUGUI _speedometer;
+
+    [SerializeField]
+    private float _horsePower;
+
+    private Rigidbody _rb;
+    [SerializeField]
+    private List<WheelCollider> _wheelColliders;
+
+    private void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+    }
+
     void FixedUpdate()
     {
-        MoveForward();
+        if(IsOnGround())
+        {
+            MoveForward();
+        }
         ChangeDirection();
     }
 
@@ -14,7 +33,10 @@ public class PlayerController : MonoBehaviour
     {
         float verticalInput = Input.GetAxis("Vertical");
 
-        transform.Translate(Vector3.forward * SPEED * verticalInput * Time.deltaTime);
+        _rb.AddRelativeForce(Vector3.forward * _horsePower * verticalInput);
+
+        int speedKilometerPerHour = Mathf.RoundToInt(_rb.velocity.magnitude);
+        _speedometer.SetText($"Speed: {speedKilometerPerHour} Km/h");
     }
 
     private void ChangeDirection()
@@ -22,5 +44,17 @@ public class PlayerController : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
 
         transform.Rotate(Vector3.up * TURN_SPEED * horizontalInput * Time.deltaTime);
+    }
+
+    private bool IsOnGround()
+    {
+        int numsOfGroundedWheel = 0;
+        foreach(WheelCollider wheelCollider in _wheelColliders)
+        {
+            if (!wheelCollider.isGrounded) continue;
+            numsOfGroundedWheel++;
+        }
+
+        return numsOfGroundedWheel == 4;
     }
 }
