@@ -4,7 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     private const float SPEED = 20.0f;
     private const float TURN_SPEED = 45.0f;
-    void Update()
+    void FixedUpdate()
     {
         MoveForward();
         ChangeDirection();
